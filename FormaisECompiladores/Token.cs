@@ -45,7 +45,7 @@ namespace FormaisECompiladores
             COMPARISON, // <= >= != ...
             ARITMETHIC, // + - * / 
             LOGICAL, // ! || &&
-            SE, // ;
+            SEPARATOR, // ;
             ERROR
         };
         
@@ -74,7 +74,7 @@ namespace FormaisECompiladores
             TokenCorrelation.Add("do", Terminals.LOOP);
             TokenCorrelation.Add("while", Terminals.LOOP);
             TokenCorrelation.Add("break", Terminals.LOOP);
-            TokenCorrelation.Add(";", Terminals.SE);
+            TokenCorrelation.Add(";", Terminals.SEPARATOR);
             TokenCorrelation.Add("basic", Terminals.BASIC);
             TokenCorrelation.Add("(", Terminals.BRKTPARE);
             TokenCorrelation.Add(")", Terminals.BRKTPARE);
