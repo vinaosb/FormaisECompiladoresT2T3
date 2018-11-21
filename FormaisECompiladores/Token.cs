@@ -35,50 +35,44 @@ namespace FormaisECompiladores
         public enum Terminals
         {
             ID,
-            BASIC,
-            LFTBRACKET,
-            RGTBRACKET,
-            LFTPARENTESIS,
-            RGTPARENTESIS,
-            LFTSQRBRACKET,
-            RGTSQRBRACKET,
-            NUM,
-            WHILE,
-            DO,
-            BREAK,
-            IF,
-            THEN,
-            ELSE,
-            REAL,
-            TRUE,
-            FALSE,
-            EQUAL,
-            NOTEQUAL,
-            ASSERT,
-            LT,
-            LTE,
-            GT,
-            GTE,
-            ADD,
-            MINUS,
-            MULTIPLY,
-            DIVIDE,
-            NOT
+            BASIC, // Outras palavras reservadas
+            BRKTPARE, // {}[]()
+            NUM, // Numeros nao float
+            LOOP, // DO WHILE BREAK
+            ITE, // if then else
+            VALUES, // REAL TRUE FALSE
+            ASSERT, // =
+            COMPARISON, // <= >= != ...
+            ARITMETHIC, // + - * / 
+            LOGICAL, // ! || &&
+            ERROR
         };
         
 
         public string path { get; set; }
         public Dictionary<string, Terminals> TokenCorrelation;
 
+        public struct Tok
+        {
+            public string s;
+            public Terminals t;
+        }
+
         public Token (string Path)
         {
             path = Path;
             TokenCorrelation = new Dictionary<string, Terminals>();
+            init();
         }
 
-        public List<Terminals> ReadFile()
+        public void init ()
         {
-            List<Terminals> LT = new List<Terminals>();
+            TokenCorrelation.Add("if", Terminals.ITE);
+        }
+
+        public List<Tok> ReadFile()
+        {
+            List<Tok> LT = new List<Tok>();
 
             try
             {   // Open the text file using a stream reader.
@@ -102,20 +96,41 @@ namespace FormaisECompiladores
             return LT;
         }
 
-        public List<Terminals> Tokenize (String s)
+        public List<Tok> Tokenize (String s)
         {
-            List<Terminals> tokens = new List<Terminals>();
-            char[] charSeparator = new char[] { ' ', ';' };
+            List<Tok> tokens = new List<Tok>();
+            char[] charSeparator = new char[] { ' ' };
             string[] result;
 
             result = s.Split(charSeparator, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var r in result)
             {
-                tokens.Add(TokenCorrelation.GetValueOrDefault(r));
+                Tok temp;
+                temp.s = r;
+                temp.t = getTerminal(r);
+                tokens.Add(temp);
             }
 
             return tokens;
+        }
+
+        public Terminals getTerminal(string s)
+        {
+            if (Char.IsNumber(s[0]))
+            {
+                if (s.Contains("."))
+                    return Terminals.VALUES;
+                return Terminals.NUM;
+            }
+            if (s.Equals("true") || s.Equals("false") || s.Equals("TRUE") || s.Equals("FALSE"))
+                return Terminals.VALUES;
+            if (TokenCorrelation.ContainsKey(s))
+                return TokenCorrelation.GetValueOrDefault(s);
+            if (Char.IsLetter(s[0]))
+                return Terminals.ID;
+            Console.WriteLine("{0} é invalido", s);
+            return Terminals.ERROR;
         }
     }
 }
