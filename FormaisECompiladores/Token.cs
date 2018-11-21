@@ -45,6 +45,7 @@ namespace FormaisECompiladores
             COMPARISON, // <= >= != ...
             ARITMETHIC, // + - * / 
             LOGICAL, // ! || &&
+            SE, // ;
             ERROR
         };
         
@@ -68,6 +69,37 @@ namespace FormaisECompiladores
         public void init ()
         {
             TokenCorrelation.Add("if", Terminals.ITE);
+            TokenCorrelation.Add("then", Terminals.ITE);
+            TokenCorrelation.Add("else", Terminals.ITE);
+            TokenCorrelation.Add("do", Terminals.LOOP);
+            TokenCorrelation.Add("while", Terminals.LOOP);
+            TokenCorrelation.Add("break", Terminals.LOOP);
+            TokenCorrelation.Add(";", Terminals.SE);
+            TokenCorrelation.Add("basic", Terminals.BASIC);
+            TokenCorrelation.Add("(", Terminals.BRKTPARE);
+            TokenCorrelation.Add(")", Terminals.BRKTPARE);
+            TokenCorrelation.Add("{", Terminals.BRKTPARE);
+            TokenCorrelation.Add("}", Terminals.BRKTPARE);
+            TokenCorrelation.Add("[", Terminals.BRKTPARE);
+            TokenCorrelation.Add("]", Terminals.BRKTPARE);
+            TokenCorrelation.Add("num", Terminals.NUM);
+            TokenCorrelation.Add("true", Terminals.VALUES);
+            TokenCorrelation.Add("false", Terminals.VALUES);
+            TokenCorrelation.Add("real", Terminals.VALUES);
+            TokenCorrelation.Add("=", Terminals.ASSERT);
+            TokenCorrelation.Add(">", Terminals.COMPARISON);
+            TokenCorrelation.Add(">=", Terminals.COMPARISON);
+            TokenCorrelation.Add("<", Terminals.COMPARISON);
+            TokenCorrelation.Add("<=", Terminals.COMPARISON);
+            TokenCorrelation.Add("==", Terminals.COMPARISON);
+            TokenCorrelation.Add("!=", Terminals.COMPARISON);
+            TokenCorrelation.Add("!", Terminals.LOGICAL);
+            TokenCorrelation.Add("&&", Terminals.LOGICAL);
+            TokenCorrelation.Add("||", Terminals.LOGICAL);
+            TokenCorrelation.Add("+", Terminals.ARITMETHIC);
+            TokenCorrelation.Add("-", Terminals.ARITMETHIC);
+            TokenCorrelation.Add("*", Terminals.ARITMETHIC);
+            TokenCorrelation.Add("/", Terminals.ARITMETHIC);
         }
 
         public List<Tok> ReadFile()
