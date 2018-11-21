@@ -1,0 +1,6 @@
+{ 
+basic [ num ] myID ;
+basic [ num ] [ num ] myID2 ;
+myID = true ;
+
+}
