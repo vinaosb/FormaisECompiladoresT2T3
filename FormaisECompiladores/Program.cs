@@ -19,8 +19,9 @@ namespace FormaisECompiladores
             List<Token.Tok> lt = t.ReadFile();
             foreach(var l in lt)
             {
-                Console.Write("<{0},{1}>", l.t, l.s);
+                Console.WriteLine("<{0},{1}>", l.t, l.s);
             }
+            Console.Read();
         }
     }
 }
