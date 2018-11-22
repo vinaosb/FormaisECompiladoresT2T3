@@ -7,31 +7,7 @@ namespace FormaisECompiladores
 {
     public class Token
     {
-        public enum NonTerminal
-        {
-            PROGRAM,
-            BLOCK,
-            DECLS,
-            TYPE,
-            TYPES,
-            STMTS,
-            STMT,
-            MATCHED_IF,
-            OPEN_IF,
-            LOC,
-            LOCS,
-            BOOL,
-            JOIN,
-            EQUALITY,
-            REL,
-            EXPR,
-            EXPRS,
-            TERM,
-            TERMS,
-            UNARY,
-            FACTOR
-        };
-
+        
         public enum Terminals
         {
             ID,
@@ -46,7 +22,8 @@ namespace FormaisECompiladores
             ARITMETHIC, // + - * / 
             LOGICAL, // ! || &&
             SEPARATOR, // ;
-            ERROR
+            ERROR,
+            EMPTY // Auxiliar pro sintatico
         };
         
 
