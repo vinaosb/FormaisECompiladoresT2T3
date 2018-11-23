@@ -8,18 +8,24 @@ namespace FormaisECompiladores
     {
         static void Main(string[] args)
         {
-            string name;
-            string path = @"";
-            Console.WriteLine("Escreva o nome do arquivo");
-            name = Console.ReadLine();
+            //string name;
+            //string path = @"";
+            //Console.WriteLine("Escreva o nome do arquivo");
+            //name = Console.ReadLine();
 
-            path += name;
+            //path += name;
 
-            Token t = new Token(path);
-            List<Token.Tok> lt = t.ReadFile();
-            foreach(var l in lt)
+            //Token t = new Token(path);
+            //List<Token.Tok> lt = t.ReadFile();
+            //foreach(var l in lt)
+            //{
+            //    Console.WriteLine("<{0},{1}>", l.a, l.s);
+            //}
+            Sintatico s = new Sintatico();
+            Console.WriteLine("Sintatico");
+            foreach(var sy in s.ReferenceTable)
             {
-                Console.WriteLine("<{0},{1}>", l.a, l.s);
+                Console.WriteLine("{0},{1}->{2}", sy.Key.nonterminal, sy.Key.terminal, sy.Value);
             }
             Console.Read();
         }

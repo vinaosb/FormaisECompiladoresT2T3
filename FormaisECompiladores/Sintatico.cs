@@ -46,11 +46,14 @@ namespace FormaisECompiladores
         }
 
         public Dictionary<NonTerminal, List<List<prod>>> Producoes { get; set; }
+        public Dictionary<prod, List<prod>> ReferenceTable { get; set; } 
 
         public Sintatico()
         {
             Producoes = new Dictionary<NonTerminal, List<List<prod>>>();
             initProd();
+            ReferenceTable = new Dictionary<prod, List<prod>>();
+            initRefTable();
         }
 
         private void initProd()
@@ -389,6 +392,57 @@ namespace FormaisECompiladores
                 
                 Producoes.Add(nt, llp);
             }
+        }
+        private void initRefTable()
+        {
+            List<List<prod>> llp;
+            //Token.Terminals t;
+            foreach (NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
+            {
+                bool hasEpson = false;
+                if (nt.Equals(NonTerminal.EMPTY))
+                    continue;
+                llp = Producoes[nt];
+                //Cada lp eh uma producao NT -> X
+                foreach(List<prod> lp in llp)
+                {
+                    List<Token.Terminals> lt = getFirstFromProd(lp);
+                    foreach(Token.Terminals t in lt)
+                    {
+                        if (t.Equals(Token.Terminals.EMPTY)) {
+                            hasEpson = true;
+                            continue;
+                        }
+
+                        if(!ReferenceTable.ContainsKey(new prod { nonterminal = nt, terminal = t }))//so por enquanto
+                            ReferenceTable.Add(new prod { nonterminal = nt, terminal = t }, lp);
+
+                    }
+                    if (hasEpson)
+                    {
+                        lt.Clear();
+                        //lt = getFollow(nt);
+                        foreach(Token.Terminals t in lt) //sao os terminais do Follow
+                        {
+                            List<prod> lpEpson = new List<prod>();
+                            lpEpson.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                            ReferenceTable.Add(new prod { nonterminal = nt, terminal = t }, lpEpson);
+                        }
+                    }
+
+                }
+            }
+        }
+
+        private List<Token.Terminals> getFirstFromProd(List<prod> lp)
+        {
+            List<Token.Terminals> lt = new List<Token.Terminals>();
+            lt.Add(Token.Terminals.BASIC);
+            //Esse metodo usa o metodo First para pegar o First da producao a direita
+            //ex: S -> ABc
+            //vai retornar o first(A), se no first(A) tiver epson, inclui o first(B)
+            
+            return lt;
         }
     }
 }
