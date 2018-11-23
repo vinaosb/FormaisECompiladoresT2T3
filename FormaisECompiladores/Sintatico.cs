@@ -209,29 +209,180 @@ namespace FormaisECompiladores
                         llp.Add(lp);
                         break;                        
                     case NonTerminal.LOC:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.ID });
+                        lp.Add(new prod { nonterminal = NonTerminal.LOCS, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.LOCS:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.OPENBRKT});
+                        lp.Add(new prod { nonterminal = NonTerminal.BOOL, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.CLOSEBRKT });
+                        lp.Add(new prod { nonterminal = NonTerminal.LOCS, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
-                    case NonTerminal.BOOL:
+                    case NonTerminal.BOOL:                        
+                        lp.Add(new prod { nonterminal = NonTerminal.JOIN, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.BOOL2, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        break;
+                    case NonTerminal.BOOL2:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.OR });
+                        lp.Add(new prod { nonterminal = NonTerminal.BOOL, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });                       
+                        llp.Add(lp);
                         break;
                     case NonTerminal.JOIN:
+                        lp.Add(new prod { nonterminal = NonTerminal.EQUALITY, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.JOIN2, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        break;
+                    case NonTerminal.JOIN2:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.AND });
+                        lp.Add(new prod { nonterminal = NonTerminal.JOIN, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.EQUALITY:
+                        lp.Add(new prod { nonterminal = NonTerminal.REL, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.EQUALITY2, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        break;
+                    case NonTerminal.EQUALITY2:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EQ });
+                        lp.Add(new prod { nonterminal = NonTerminal.EQUALITY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.NE });
+                        lp.Add(new prod { nonterminal = NonTerminal.EQUALITY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.REL:
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPR, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.REL2, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        break;
+                    case NonTerminal.REL2:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.LT });
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPR, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.LE });
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPR, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.GT });
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPR, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.GE });
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPR, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.EXPR:
+                        lp.Add(new prod { nonterminal = NonTerminal.TERM, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPRS, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.EXPRS:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.ADD });
+                        lp.Add(new prod { nonterminal = NonTerminal.TERM, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPR, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.MINUS });
+                        lp.Add(new prod { nonterminal = NonTerminal.TERM, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.EXPR, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.TERM:
+                        lp.Add(new prod { nonterminal = NonTerminal.UNARY, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.TERMS, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.TERMS:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.MULTIPLY });
+                        lp.Add(new prod { nonterminal = NonTerminal.UNARY, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.TERMS, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.DIVIDE });
+                        lp.Add(new prod { nonterminal = NonTerminal.UNARY, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.TERMS, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.UNARY:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.NOT });
+                        lp.Add(new prod { nonterminal = NonTerminal.UNARY, terminal = Token.Terminals.EMPTY });                        
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.MINUS });
+                        lp.Add(new prod { nonterminal = NonTerminal.UNARY, terminal = Token.Terminals.EMPTY });                        
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.FACTOR, terminal = Token.Terminals.EMPTY });
+                        llp.Add(lp);
                         break;
                     case NonTerminal.FACTOR:
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.OPENPARENT });
+                        lp.Add(new prod { nonterminal = NonTerminal.BOOL, terminal = Token.Terminals.EMPTY });
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.CLOSEPARENT });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.LOC, terminal = Token.Terminals.MINUS });                        
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.NUM});
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.REAL });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.TRUE });
+                        llp.Add(lp);
+                        lp = new List<prod>();
+                        lp.Clear();
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.FALSE });
+                        llp.Add(lp);
                         break;
+                        
                     default:
                         break;
                 }
