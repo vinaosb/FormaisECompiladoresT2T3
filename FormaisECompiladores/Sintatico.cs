@@ -422,12 +422,12 @@ namespace FormaisECompiladores
                     {
                         lt.Clear();
                         //lt = getFollow(nt);
-                        foreach(Token.Terminals t in lt) //sao os terminais do Follow
-                        {
-                            List<prod> lpEpson = new List<prod>();
-                            lpEpson.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
-                            ReferenceTable.Add(new prod { nonterminal = nt, terminal = t }, lpEpson);
-                        }
+                        //foreach(Token.Terminals t in lt) //sao os terminais do Follow
+                        //{
+                        //    List<prod> lpEpson = new List<prod>();
+                        //    lpEpson.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                        //    ReferenceTable.Add(new prod { nonterminal = nt, terminal = t }, lpEpson);
+                        //}
                     }
 
                 }
@@ -437,12 +437,222 @@ namespace FormaisECompiladores
         private List<Token.Terminals> getFirstFromProd(List<prod> lp)
         {
             List<Token.Terminals> lt = new List<Token.Terminals>();
-            lt.Add(Token.Terminals.BASIC);
+            
             //Esse metodo usa o metodo First para pegar o First da producao a direita
             //ex: S -> ABc
             //vai retornar o first(A), se no first(A) tiver epson, inclui o first(B)
+            if (lp[0].nonterminal.Equals(NonTerminal.EMPTY))
+            {                
+                lt.Add(lp[0].terminal);
+                return lt;
+            }
+            //else First
+            foreach(prod p in lp)
+            {
+                if (p.nonterminal.Equals(NonTerminal.EMPTY))
+                {
+                    lt.Add(p.terminal);
+                    return lt;
+                }
+                //lt = fixedFirst(p.nonterminal);
+                lt.AddRange(fixedFirst(p.nonterminal).FindAll((x) => !lt.Contains(x)));
+                if (!fixedFirst(p.nonterminal).Contains(Token.Terminals.EMPTY))
+                    return lt;
+            }
             
+            //lt.Add(Token.Terminals.BASIC);//pra testar so.
             return lt;
+        }
+        private List<Token.Terminals> fixedFirst(NonTerminal n)
+        {
+            List<Token.Terminals> first = new List<Token.Terminals>();
+            switch(n){
+                case(NonTerminal.PROGRAM):
+                    first.Add(Token.Terminals.OPENBRACE);
+                    break;
+                case (NonTerminal.BLOCK):
+                    first.Add(Token.Terminals.OPENBRACE);
+                    break;
+                case (NonTerminal.DECLS):
+                    first.Add(Token.Terminals.BASIC);
+                    break;
+                case (NonTerminal.DECL):
+                    first.Add(Token.Terminals.BASIC);
+                    break;
+                case (NonTerminal.TYPE):
+                    first.Add(Token.Terminals.BASIC);
+                    break;
+                case (NonTerminal.TYPES):
+                    first.Add(Token.Terminals.OPENBRKT);
+                    break;
+                case (NonTerminal.STMTS):
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.IF);
+                    first.Add(Token.Terminals.WHILE);
+                    first.Add(Token.Terminals.DO);
+                    first.Add(Token.Terminals.BREAK);
+                    first.Add(Token.Terminals.OPENBRACE);
+                    first.Add(Token.Terminals.EMPTY);
+                    break;
+                case (NonTerminal.STMT):
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.IF);
+                    first.Add(Token.Terminals.WHILE);
+                    first.Add(Token.Terminals.DO);
+                    first.Add(Token.Terminals.BREAK);
+                    first.Add(Token.Terminals.OPENBRACE);
+                    break;
+                case (NonTerminal.STMTX):
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.WHILE);
+                    first.Add(Token.Terminals.DO);
+                    first.Add(Token.Terminals.BREAK);
+                    first.Add(Token.Terminals.OPENBRACE);
+                    break;
+                case NonTerminal.OPEN_IF:
+                    first.Add(Token.Terminals.IF);
+                  
+                    break;
+                case NonTerminal.OPEN_IF2:
+                    first.Add(Token.Terminals.ELSE);
+                    first.Add(Token.Terminals.EMPTY);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.WHILE);
+                    first.Add(Token.Terminals.DO);
+                    first.Add(Token.Terminals.BREAK);
+                    first.Add(Token.Terminals.OPENBRACE);
+                   
+                    break;
+                case NonTerminal.LOC:
+                    first.Add(Token.Terminals.ID);
+                 
+                    break;
+                case NonTerminal.LOCS:
+                    first.Add(Token.Terminals.OPENBRKT);
+                    first.Add(Token.Terminals.EMPTY);
+                  
+                    break;
+                case NonTerminal.BOOL:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+                case NonTerminal.BOOL2:
+                    first.Add(Token.Terminals.OR);
+                    first.Add(Token.Terminals.EMPTY);
+                    
+                    break;
+                case NonTerminal.JOIN:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+                case NonTerminal.JOIN2:
+                    first.Add(Token.Terminals.AND);
+                    first.Add(Token.Terminals.EMPTY);
+           
+                    break;
+                case NonTerminal.EQUALITY:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+                case NonTerminal.EQUALITY2:
+                    first.Add(Token.Terminals.EQ);
+                    first.Add(Token.Terminals.NE);
+                    first.Add(Token.Terminals.EMPTY);
+            
+                    break;
+                case NonTerminal.REL:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+                case NonTerminal.REL2:
+                    first.Add(Token.Terminals.LT);
+                    first.Add(Token.Terminals.LE);
+                    first.Add(Token.Terminals.GT);
+                    first.Add(Token.Terminals.GE);
+                    first.Add(Token.Terminals.EMPTY);
+                  
+                    break;
+                case NonTerminal.EXPR:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+                case NonTerminal.EXPRS:
+                    first.Add(Token.Terminals.ADD);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.EMPTY);
+           
+                    break;
+                case NonTerminal.TERM:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+                case NonTerminal.TERMS:
+                    first.Add(Token.Terminals.MULTIPLY);
+                    first.Add(Token.Terminals.DIVIDE);
+                    first.Add(Token.Terminals.EMPTY);
+          
+                    break;
+                case NonTerminal.UNARY:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+                case NonTerminal.FACTOR:
+                    first.Add(Token.Terminals.NOT);
+                    first.Add(Token.Terminals.MINUS);
+                    first.Add(Token.Terminals.OPENPARENT);
+                    first.Add(Token.Terminals.ID);
+                    first.Add(Token.Terminals.NUM);
+                    first.Add(Token.Terminals.REAL);
+                    first.Add(Token.Terminals.TRUE);
+                    first.Add(Token.Terminals.FALSE);
+                    break;
+
+                default:
+                    break;
+            }
+            return first;
         }
     }
 }
