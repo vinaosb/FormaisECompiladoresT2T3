@@ -55,7 +55,9 @@ namespace FormaisECompiladores
             initProd();
             ReferenceTable = new Dictionary<prod, List<prod>>();
             initRefTable();
- 
+            printFirst();
+
+
         }
 
         private void initProd()
@@ -689,6 +691,19 @@ namespace FormaisECompiladores
                 if (lp.Contains(new prod { terminal = Token.Terminals.EMPTY, nonterminal = NonTerminal.EMPTY }))
                     return true;
             return false;
+        }
+        public void printFirst()
+        {
+            foreach (NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
+            {
+                List<Token.Terminals> list = First(nt);
+                string term = "";
+                foreach (var t in list)
+                {
+                    term += t.ToString() + ",";
+                }
+                Console.WriteLine("First({0}):{1}", nt.ToString(), term);
+            }
         }
     }
 }
