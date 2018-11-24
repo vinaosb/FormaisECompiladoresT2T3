@@ -60,8 +60,6 @@ namespace FormaisECompiladores
             GenFollows();
             printFirst();
             printFollow();
-
-
         }
 
         private void initProd()
