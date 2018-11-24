@@ -1036,7 +1036,30 @@ namespace FormaisECompiladores
                                 }
                             }
                         }
-
+                        
+                        if (lp.Count == 2) // Regra 3.1
+                        {
+                            if (lp[1].nonterminal != NonTerminal.EMPTY)
+                            {
+                                if (lp[0].nonterminal != NonTerminal.EMPTY) // regra 2
+                                {
+                                    Follows.GetValueOrDefault(lp[0].nonterminal).Add(Token.Terminals.EMPTY);
+                                    if (!Follows.GetValueOrDefault(lp[0].nonterminal).IsSupersetOf(First(lp[1].nonterminal)))
+                                    {
+                                        Follows.GetValueOrDefault(lp[0].nonterminal).UnionWith(First(lp[1].nonterminal));
+                                        houveMudancas = true;
+                                    }
+                                    Follows.GetValueOrDefault(lp[0].nonterminal).Remove(Token.Terminals.EMPTY);
+                                }
+                                if (!Follows.GetValueOrDefault(lp[1].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
+                                    houveMudancas = true;
+                                Follows.GetValueOrDefault(lp[1].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
+                            }
+                            if (lp[1].terminal != Token.Terminals.EMPTY && lp[0].nonterminal != NonTerminal.EMPTY) // Regra 2
+                                if (Follows.GetValueOrDefault(lp[0].nonterminal).Add(lp[1].terminal))
+                                    houveMudancas = true;
+                        }
+                        
                         if (lp.Count <= 2) // Regra 3.1
                             if (lp[0].nonterminal != NonTerminal.EMPTY)
                             {
