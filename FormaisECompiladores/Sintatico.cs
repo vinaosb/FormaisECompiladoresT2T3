@@ -46,7 +46,8 @@ namespace FormaisECompiladores
         }
 
         public Dictionary<NonTerminal, List<List<prod>>> Producoes { get; set; }
-        public Dictionary<prod, List<prod>> ReferenceTable { get; set; } 
+        public Dictionary<prod, List<prod>> ReferenceTable { get; set; }
+
 
         public Sintatico()
         {
@@ -54,6 +55,7 @@ namespace FormaisECompiladores
             initProd();
             ReferenceTable = new Dictionary<prod, List<prod>>();
             initRefTable();
+ 
         }
 
         private void initProd()
@@ -366,7 +368,7 @@ namespace FormaisECompiladores
                         llp.Add(lp);
                         lp = new List<prod>();
                         lp.Clear();
-                        lp.Add(new prod { nonterminal = NonTerminal.LOC, terminal = Token.Terminals.MINUS });                        
+                        lp.Add(new prod { nonterminal = NonTerminal.LOC, terminal = Token.Terminals.EMPTY });                        
                         llp.Add(lp);
                         lp = new List<prod>();
                         lp.Clear();
@@ -475,6 +477,7 @@ namespace FormaisECompiladores
                     break;
                 case (NonTerminal.DECLS):
                     first.Add(Token.Terminals.BASIC);
+                    first.Add(Token.Terminals.EMPTY);
                     break;
                 case (NonTerminal.DECL):
                     first.Add(Token.Terminals.BASIC);
@@ -484,6 +487,7 @@ namespace FormaisECompiladores
                     break;
                 case (NonTerminal.TYPES):
                     first.Add(Token.Terminals.OPENBRKT);
+                    first.Add(Token.Terminals.EMPTY);
                     break;
                 case (NonTerminal.STMTS):
                     first.Add(Token.Terminals.ID);
@@ -515,12 +519,7 @@ namespace FormaisECompiladores
                     break;
                 case NonTerminal.OPEN_IF2:
                     first.Add(Token.Terminals.ELSE);
-                    first.Add(Token.Terminals.EMPTY);
-                    first.Add(Token.Terminals.ID);
-                    first.Add(Token.Terminals.WHILE);
-                    first.Add(Token.Terminals.DO);
-                    first.Add(Token.Terminals.BREAK);
-                    first.Add(Token.Terminals.OPENBRACE);
+                    first.Add(Token.Terminals.EMPTY);      
                    
                     break;
                 case NonTerminal.LOC:
@@ -639,8 +638,6 @@ namespace FormaisECompiladores
                     first.Add(Token.Terminals.FALSE);
                     break;
                 case NonTerminal.FACTOR:
-                    first.Add(Token.Terminals.NOT);
-                    first.Add(Token.Terminals.MINUS);
                     first.Add(Token.Terminals.OPENPARENT);
                     first.Add(Token.Terminals.ID);
                     first.Add(Token.Terminals.NUM);
@@ -654,5 +651,6 @@ namespace FormaisECompiladores
             }
             return first;
         }
+   
     }
 }
