@@ -672,14 +672,15 @@ namespace FormaisECompiladores
                         ret.Add(lp[i].terminal);
                         continue;
                     }
-                    if (lp[i].terminal == Token.Terminals.EMPTY && lp[0].nonterminal == NonTerminal.EMPTY)
-                        continue;
 
                     ret.AddRange(First(lp[i].nonterminal));
 
                 } while (NextHasEmpty(lp[i].nonterminal));
 
             }
+
+            if (ret.Count == 0)
+                ret.Add(Token.Terminals.EMPTY);
 
             return ret;
         }
