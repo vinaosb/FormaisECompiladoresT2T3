@@ -57,8 +57,8 @@ namespace FormaisECompiladores
             ReferenceTable = new Dictionary<prod, List<prod>>();
             initRefTable();
             Follows = new Dictionary<NonTerminal, HashSet<Token.Terminals>>();
-            //GenFollows();
-            //printFirst();
+            GenFollows();
+            printFirst();
 
 
         }
