@@ -1,0 +1,11 @@
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/bin/Debug/netcoreapp2.0/FormaisECompiladores.deps.json
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/bin/Debug/netcoreapp2.0/FormaisECompiladores.runtimeconfig.json
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/bin/Debug/netcoreapp2.0/FormaisECompiladores.runtimeconfig.dev.json
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/bin/Debug/netcoreapp2.0/FormaisECompiladores.dll
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/bin/Debug/netcoreapp2.0/FormaisECompiladores.pdb
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/obj/Debug/netcoreapp2.0/FormaisECompiladores.csprojAssemblyReference.cache
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/obj/Debug/netcoreapp2.0/FormaisECompiladores.csproj.CoreCompileInputs.cache
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/obj/Debug/netcoreapp2.0/FormaisECompiladores.AssemblyInfoInputs.cache
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/obj/Debug/netcoreapp2.0/FormaisECompiladores.AssemblyInfo.cs
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/obj/Debug/netcoreapp2.0/FormaisECompiladores.dll
+/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/obj/Debug/netcoreapp2.0/FormaisECompiladores.pdb

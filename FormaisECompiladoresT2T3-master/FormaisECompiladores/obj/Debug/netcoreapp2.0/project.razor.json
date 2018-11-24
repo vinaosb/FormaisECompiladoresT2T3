@@ -1,0 +1,14 @@
+{
+  "ProjectFilePath": "/home/thiago/Área de Trabalho/FormaisECompiladoresT2T3-master/FormaisECompiladores/FormaisECompiladores.csproj",
+  "TargetFramework": "netcoreapp2.0",
+  "TagHelpers": [],
+  "Configuration": {
+    "ConfigurationName": "UnsupportedRazor",
+    "LanguageVersion": "1.0",
+    "Extensions": [
+      {
+        "ExtensionName": "UnsupportedRazorExtension"
+      }
+    ]
+  }
+}
