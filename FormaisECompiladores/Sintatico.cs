@@ -985,7 +985,7 @@ namespace FormaisECompiladores
             {
                 HashSet<Token.Terminals> lt = new HashSet<Token.Terminals>();
                 if (nt.Equals(NonTerminal.PROGRAM))
-                    lt.Add(Token.Terminals.DOLLAR); // $ no primeiro elemento
+                    lt.Add(Token.Terminals.DOLLAR); // $ no primeiro elemento - Regra 1
                 Follows.Add(nt, lt);
             }
             bool houveMudancas;
@@ -998,75 +998,37 @@ namespace FormaisECompiladores
                 {
                     foreach(var lp in Producoes.GetValueOrDefault(nt))
                     {
-                        if (lp.Count >= 2)
+                        for (int i = 0; i < lp.Count; i++)
                         {
-                            for (int i = 0; i < lp.Count -1; i++)
+                            if (lp[i].nonterminal != NonTerminal.EMPTY && i == lp.Count - 1) // Regra 3.1
                             {
-                                if (lp[i].nonterminal != NonTerminal.EMPTY && lp[i+1].nonterminal != NonTerminal.EMPTY)  // Regra 2
-                                {
-                                    Follows.GetValueOrDefault(lp[i].nonterminal).Add(Token.Terminals.EMPTY);
-                                    if (!Follows.GetValueOrDefault(lp[i].nonterminal).IsSupersetOf(First(lp[i + 1].nonterminal)))
-                                    {
-                                        Follows.GetValueOrDefault(lp[i].nonterminal).UnionWith(First(lp[i + 1].nonterminal)); // B <- First(c)
-                                        houveMudancas = true;
-                                    }
-                                    Follows.GetValueOrDefault(lp[i].nonterminal).Remove(Token.Terminals.EMPTY);
-
-                                    if (First(lp[i+1].nonterminal).Contains(Token.Terminals.EMPTY) && 
-                                        !Follows.GetValueOrDefault(lp[i].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt))) // Regra 3.2
-                                    {
-                                        Follows.GetValueOrDefault(lp[i].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
-                                        houveMudancas = true;
-                                    }
-
-                                    if (i == lp.Count-2) // Regra 3.1
-                                    {
-                                        if (!Follows.GetValueOrDefault(lp[i+1].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
-                                        {
-                                            Follows.GetValueOrDefault(lp[i + 1].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
-                                            houveMudancas = true;
-                                        }
-                                    }
-                                }
-
-                                else if (lp[i].nonterminal != NonTerminal.EMPTY && lp[i+1].terminal != Token.Terminals.EMPTY)
-                                {
-                                    if (Follows.GetValueOrDefault(lp[i].nonterminal).Add(lp[i + 1].terminal))
-                                        houveMudancas = true;
-                                }
+                                if (!Follows.GetValueOrDefault(lp[i].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
+                                    houveMudancas = true;
+                                Follows.GetValueOrDefault(lp[i].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
+                                break;
                             }
+                            else if (lp[i].nonterminal != NonTerminal.EMPTY && lp[i + 1].nonterminal != NonTerminal.EMPTY)
+                            {
+                                HashSet<Token.Terminals> temp = First(lp[i + 1].nonterminal);
+                                temp.Remove(Token.Terminals.EMPTY);
+
+                                if (!Follows.GetValueOrDefault(lp[i].nonterminal).IsSupersetOf(temp))
+                                    houveMudancas = true;
+                                Follows.GetValueOrDefault(lp[i].nonterminal).UnionWith(temp); // Regra 2.2
+
+
+                                if (!Follows.GetValueOrDefault(lp[i].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(lp[i+1].nonterminal))) // Regra 3.2
+                                    houveMudancas = true;
+                                Follows.GetValueOrDefault(lp[i].nonterminal).UnionWith(Follows.GetValueOrDefault(lp[i + 1].nonterminal));
+                            }
+                            else if (lp[i].nonterminal != NonTerminal.EMPTY && lp[i+1].terminal != Token.Terminals.EMPTY) // Regra 2.1
+                            {
+                                if (Follows.GetValueOrDefault(lp[i].nonterminal).Add(lp[i + 1].terminal))
+                                    houveMudancas = true;
+                            }
+                            
                         }
                         
-                        if (lp.Count == 2) // Regra 3.1
-                        {
-                            if (lp[1].nonterminal != NonTerminal.EMPTY)
-                            {
-                                if (lp[0].nonterminal != NonTerminal.EMPTY) // regra 2
-                                {
-                                    Follows.GetValueOrDefault(lp[0].nonterminal).Add(Token.Terminals.EMPTY);
-                                    if (!Follows.GetValueOrDefault(lp[0].nonterminal).IsSupersetOf(First(lp[1].nonterminal)))
-                                    {
-                                        Follows.GetValueOrDefault(lp[0].nonterminal).UnionWith(First(lp[1].nonterminal));
-                                        houveMudancas = true;
-                                    }
-                                    Follows.GetValueOrDefault(lp[0].nonterminal).Remove(Token.Terminals.EMPTY);
-                                }
-                                if (!Follows.GetValueOrDefault(lp[1].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
-                                    houveMudancas = true;
-                                Follows.GetValueOrDefault(lp[1].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
-                            }
-                            if (lp[1].terminal != Token.Terminals.EMPTY && lp[0].nonterminal != NonTerminal.EMPTY) // Regra 2
-                                if (Follows.GetValueOrDefault(lp[0].nonterminal).Add(lp[1].terminal))
-                                    houveMudancas = true;
-                        }
-                        
-                        if (lp.Count <= 2) // Regra 3.1
-                            if (lp[0].nonterminal != NonTerminal.EMPTY)
-                            {
-                                if (!Follows.GetValueOrDefault(lp[0].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
-                                    houveMudancas = true;
-                                Follows.GetValueOrDefault(lp[0].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
-                            }
                     }
                 }
             } while (houveMudancas);
