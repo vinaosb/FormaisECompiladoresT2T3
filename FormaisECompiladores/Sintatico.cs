@@ -57,8 +57,8 @@ namespace FormaisECompiladores
             ReferenceTable = new Dictionary<prod, List<prod>>();
             initRefTable();
             Follows = new Dictionary<NonTerminal, HashSet<Token.Terminals>>();
-            GenFollows();
-            printFirst();
+            //GenFollows();
+            //printFirst();
 
 
         }
@@ -128,7 +128,7 @@ namespace FormaisECompiladores
                         lp.Add(new prod { nonterminal = NonTerminal.LOC, terminal = Token.Terminals.EMPTY });
                         lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.ASSERT });
                         lp.Add(new prod { nonterminal = NonTerminal.BOOL, terminal = Token.Terminals.EMPTY });
-                        lp.Add(new prod { nonterminal = NonTerminal.DECLS, terminal = Token.Terminals.SEPARATOR });
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.SEPARATOR });
                         llp.Add(lp);
                         lp = new List<prod>();
                         lp.Clear();
@@ -407,7 +407,7 @@ namespace FormaisECompiladores
             foreach (NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
             {
                 bool hasEpson = false;
-                if (nt.Equals(NonTerminal.EMPTY))
+                if (nt.Equals(NonTerminal.EMPTY))//pois nao queremos calcular o First do Empty
                     continue;
                 llp = Producoes[nt];
                 //Cada lp eh uma producao NT -> X
@@ -418,7 +418,7 @@ namespace FormaisECompiladores
                     {
                         if (t.Equals(Token.Terminals.EMPTY)) {
                             hasEpson = true;
-                            continue;
+                            continue;//pois epson nao entra na tabela de analise
                         }
 
                         if(!ReferenceTable.ContainsKey(new prod { nonterminal = nt, terminal = t }))//so por enquanto
@@ -428,13 +428,13 @@ namespace FormaisECompiladores
                     if (hasEpson)
                     {
                         lt.Clear();
-                        //lt = getFollow(nt);
-                        //foreach(Token.Terminals t in lt) //sao os terminais do Follow
-                        //{
-                        //    List<prod> lpEpson = new List<prod>();
-                        //    lpEpson.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
-                        //    ReferenceTable.Add(new prod { nonterminal = nt, terminal = t }, lpEpson);
-                        //}
+                        lt = fixedFollow(nt);
+                        foreach (Token.Terminals t in lt) //sao os terminais do Follow
+                        {
+                            List<prod> lpEpson = new List<prod>();
+                            lpEpson.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
+                            ReferenceTable.Add(new prod { nonterminal = nt, terminal = t }, lpEpson);
+                        }
                     }
 
                 }
@@ -655,6 +655,286 @@ namespace FormaisECompiladores
                     break;
             }
             return first;
+        }
+        private List<Token.Terminals> fixedFollow(NonTerminal n)
+        {
+            List<Token.Terminals> follow = new List<Token.Terminals>();
+            switch (n)
+            {
+                case (NonTerminal.PROGRAM):
+                    follow.Add(Token.Terminals.DOLLAR);
+                    break;
+                case (NonTerminal.BLOCK):
+                    follow.Add(Token.Terminals.DOLLAR);
+                    follow.Add(Token.Terminals.ID);
+                    follow.Add(Token.Terminals.IF);
+                    follow.Add(Token.Terminals.WHILE);
+                    follow.Add(Token.Terminals.DO);
+                    follow.Add(Token.Terminals.BREAK);
+                    follow.Add(Token.Terminals.OPENBRACE);
+                    follow.Add(Token.Terminals.CLOSEBRACE);
+                    break;
+                case (NonTerminal.DECLS):
+                    follow.Add(Token.Terminals.ID);
+                    follow.Add(Token.Terminals.IF);
+                    follow.Add(Token.Terminals.WHILE);
+                    follow.Add(Token.Terminals.DO);
+                    follow.Add(Token.Terminals.BREAK);
+                    follow.Add(Token.Terminals.OPENBRACE);
+                    follow.Add(Token.Terminals.CLOSEBRACE);
+                    break;
+                case (NonTerminal.DECL):
+                    follow.Add(Token.Terminals.BASIC);
+                    follow.Add(Token.Terminals.ID);
+                    follow.Add(Token.Terminals.IF);
+                    follow.Add(Token.Terminals.WHILE);
+                    follow.Add(Token.Terminals.DO);
+                    follow.Add(Token.Terminals.BREAK);
+                    follow.Add(Token.Terminals.OPENBRACE);
+                    follow.Add(Token.Terminals.CLOSEBRACE);
+                    break;
+                case (NonTerminal.TYPE):
+                    follow.Add(Token.Terminals.ID);
+                    break;
+                case (NonTerminal.TYPES):
+                    follow.Add(Token.Terminals.ID);
+                    break;
+                case (NonTerminal.STMTS):
+                    follow.Add(Token.Terminals.CLOSEBRACE);    
+                    break;
+                case (NonTerminal.STMT):
+                    follow.Add(Token.Terminals.ID);
+                    follow.Add(Token.Terminals.IF);
+                    follow.Add(Token.Terminals.WHILE);
+                    follow.Add(Token.Terminals.DO);
+                    follow.Add(Token.Terminals.BREAK);
+                    follow.Add(Token.Terminals.OPENBRACE);
+                    follow.Add(Token.Terminals.CLOSEBRACE);
+                    break;
+                case (NonTerminal.STMTX):
+                    follow.Add(Token.Terminals.ID);
+                    follow.Add(Token.Terminals.WHILE);
+                    follow.Add(Token.Terminals.DO);
+                    follow.Add(Token.Terminals.BREAK);
+                    follow.Add(Token.Terminals.OPENBRACE);
+                    follow.Add(Token.Terminals.ELSE);
+                    follow.Add(Token.Terminals.CLOSEBRACE);
+                    follow.Add(Token.Terminals.IF);
+                    break;
+                case NonTerminal.OPEN_IF:
+                    follow.Add(Token.Terminals.ID);
+                    follow.Add(Token.Terminals.IF);
+                    follow.Add(Token.Terminals.WHILE);
+                    follow.Add(Token.Terminals.DO);
+                    follow.Add(Token.Terminals.BREAK);
+                    follow.Add(Token.Terminals.OPENBRACE);
+                    follow.Add(Token.Terminals.CLOSEBRACE);
+
+                    break;
+                case NonTerminal.OPEN_IF2:
+                    follow.Add(Token.Terminals.ID);
+                    follow.Add(Token.Terminals.IF);
+                    follow.Add(Token.Terminals.WHILE);
+                    follow.Add(Token.Terminals.DO);
+                    follow.Add(Token.Terminals.BREAK);
+                    follow.Add(Token.Terminals.OPENBRACE);
+                    follow.Add(Token.Terminals.CLOSEBRACE);
+
+                    break;
+                case NonTerminal.LOC:
+                    follow.Add(Token.Terminals.EQ);
+                    follow.Add(Token.Terminals.MULTIPLY);
+                    follow.Add(Token.Terminals.DIVIDE);
+                    follow.Add(Token.Terminals.ADD);
+                    follow.Add(Token.Terminals.MINUS);
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);
+                    follow.Add(Token.Terminals.ASSERT);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    break;
+                case NonTerminal.LOCS:
+                    follow.Add(Token.Terminals.EQ);
+                    follow.Add(Token.Terminals.MULTIPLY);
+                    follow.Add(Token.Terminals.DIVIDE);
+                    follow.Add(Token.Terminals.ADD);
+                    follow.Add(Token.Terminals.MINUS);
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);
+                    follow.Add(Token.Terminals.ASSERT);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+
+                    break;
+                case NonTerminal.BOOL:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    break;
+                case NonTerminal.BOOL2:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+
+                    break;
+                case NonTerminal.JOIN:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    follow.Add(Token.Terminals.OR);
+                    break;
+                case NonTerminal.JOIN2:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    follow.Add(Token.Terminals.OR);
+
+                    break;
+                case NonTerminal.EQUALITY:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.AND);
+                    break;
+                case NonTerminal.EQUALITY2:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.AND);
+
+                    break;
+                case NonTerminal.REL:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.EQ);
+                    break;
+                case NonTerminal.REL2:
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.EQ);
+
+                    break;
+                case NonTerminal.EXPR:
+                    follow.Add(Token.Terminals.EQ);                
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    break;
+                case NonTerminal.EXPRS:
+                    follow.Add(Token.Terminals.EQ);
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+
+                    break;
+                case NonTerminal.TERM:
+                    follow.Add(Token.Terminals.EQ);
+                 
+                    follow.Add(Token.Terminals.ADD);
+                    follow.Add(Token.Terminals.MINUS);
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    break;
+                case NonTerminal.TERMS:
+                    follow.Add(Token.Terminals.EQ);
+
+                    follow.Add(Token.Terminals.ADD);
+                    follow.Add(Token.Terminals.MINUS);
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+
+                    break;
+                case NonTerminal.UNARY:
+                    follow.Add(Token.Terminals.EQ);
+                    follow.Add(Token.Terminals.MULTIPLY);
+                    follow.Add(Token.Terminals.DIVIDE);
+                    follow.Add(Token.Terminals.ADD);
+                    follow.Add(Token.Terminals.MINUS);
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);           
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    break;
+                case NonTerminal.FACTOR:
+                    follow.Add(Token.Terminals.EQ);
+                    follow.Add(Token.Terminals.MULTIPLY);
+                    follow.Add(Token.Terminals.DIVIDE);
+                    follow.Add(Token.Terminals.ADD);
+                    follow.Add(Token.Terminals.MINUS);
+                    follow.Add(Token.Terminals.LT);
+                    follow.Add(Token.Terminals.LE);
+                    follow.Add(Token.Terminals.GT);
+                    follow.Add(Token.Terminals.GE);
+                    follow.Add(Token.Terminals.NE);
+                    follow.Add(Token.Terminals.AND);
+                    follow.Add(Token.Terminals.OR);
+                    follow.Add(Token.Terminals.SEPARATOR);
+                    follow.Add(Token.Terminals.CLOSEBRKT);
+                    follow.Add(Token.Terminals.CLOSEPARENT);
+                    break;
+
+                default:
+                    break;
+            }
+            return follow;
         }
 
         private HashSet<Token.Terminals> First(NonTerminal nt)
