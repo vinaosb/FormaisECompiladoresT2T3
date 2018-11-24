@@ -47,6 +47,7 @@ namespace FormaisECompiladores
 
         public Dictionary<NonTerminal, List<List<prod>>> Producoes { get; set; }
         public Dictionary<prod, List<prod>> ReferenceTable { get; set; }
+        public Dictionary<NonTerminal, HashSet<Token.Terminals>> Follows { get; set; }
 
 
         public Sintatico()
@@ -55,6 +56,8 @@ namespace FormaisECompiladores
             initProd();
             ReferenceTable = new Dictionary<prod, List<prod>>();
             initRefTable();
+            Follows = new Dictionary<NonTerminal, HashSet<Token.Terminals>>();
+            //GenFollows();
             printFirst();
 
 
@@ -654,9 +657,9 @@ namespace FormaisECompiladores
             return first;
         }
 
-        private List<Token.Terminals> First(NonTerminal nt)
+        private HashSet<Token.Terminals> First(NonTerminal nt)
         {
-            List<Token.Terminals> ret = new List<Token.Terminals>();
+            HashSet<Token.Terminals> ret = new HashSet<Token.Terminals>();
 
             List<List<prod>> llp = Producoes.GetValueOrDefault(nt);
 
@@ -672,7 +675,7 @@ namespace FormaisECompiladores
                         continue;
                     }
 
-                    ret.AddRange(First(lp[i].nonterminal));
+                    ret.UnionWith(First(lp[i].nonterminal));
 
                 } while (NextHasEmpty(lp[i].nonterminal));
 
@@ -693,11 +696,62 @@ namespace FormaisECompiladores
                     return true;
             return false;
         }
+
+        private void GenFollows()
+        {
+            Follows.Clear();
+            foreach(NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
+            {
+                HashSet<Token.Terminals> lt = new HashSet<Token.Terminals>();
+                if (nt.Equals(NonTerminal.PROGRAM))
+                    lt.Add(Token.Terminals.EMPTY); // $ no primeiro elemento
+                Follows.Add(nt, lt);
+            }
+            bool houveMudancas = false, copyToNext = false;
+            do
+            {
+                houveMudancas = false;
+                HashSet<Token.Terminals> temp = new HashSet<Token.Terminals>();
+
+                foreach (NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
+                {
+                    if (copyToNext)
+                    {
+                        Follows.GetValueOrDefault(nt).UnionWith(temp);
+                        copyToNext = false;
+                        houveMudancas = true;
+                    }
+
+                    foreach (var lp in Producoes.GetValueOrDefault(nt))
+                    {
+                        if (lp.Count > 1)
+                        {
+                            if (lp[1].nonterminal != NonTerminal.EMPTY)
+                            {
+                                Follows.Add(nt, First(nt));
+                                if (Follows.GetValueOrDefault(nt).Contains(Token.Terminals.EMPTY))
+                                    Follows.GetValueOrDefault(nt).Remove(Token.Terminals.EMPTY);
+
+                                houveMudancas = true;
+                            }
+                        }
+                    }
+
+                    if (First(nt).Contains(Token.Terminals.EMPTY))
+                    {
+                        temp = Follows.GetValueOrDefault(nt);
+                        copyToNext = true;
+                        houveMudancas = true;
+                    }
+                }
+            } while (houveMudancas);
+        }
+
         public void printFirst()
         {
             foreach (NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
             {
-                List<Token.Terminals> list = First(nt);
+                HashSet<Token.Terminals> list = First(nt);
                 string term = "";
                 foreach (var t in list)
                 {
