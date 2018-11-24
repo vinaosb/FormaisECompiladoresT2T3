@@ -726,13 +726,22 @@ namespace FormaisECompiladores
                     {
                         if (lp.Count > 1)
                         {
-                            if (lp[1].nonterminal != NonTerminal.EMPTY)
+                            for(int i = 1; i < lp.Count; i++)
                             {
-                                Follows.Add(nt, First(nt));
-                                if (Follows.GetValueOrDefault(nt).Contains(Token.Terminals.EMPTY))
-                                    Follows.GetValueOrDefault(nt).Remove(Token.Terminals.EMPTY);
+                                if (lp[i].terminal != Token.Terminals.EMPTY)
+                                {
+                                    Follows.GetValueOrDefault(nt).Add(lp[i].terminal);
+                                    houveMudancas = true;
+                                }
+                                if (lp[i].nonterminal != NonTerminal.EMPTY)
+                                {
+                                    Follows.Add(nt, First(nt));
+                                    if (Follows.GetValueOrDefault(nt).Contains(Token.Terminals.EMPTY))
+                                        Follows.GetValueOrDefault(nt).Remove(Token.Terminals.EMPTY);
 
-                                houveMudancas = true;
+                                    houveMudancas = true;
+                                }
+                                break;
                             }
                         }
                     }
