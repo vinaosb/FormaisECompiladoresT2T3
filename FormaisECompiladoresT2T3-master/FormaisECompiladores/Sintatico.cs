@@ -120,7 +120,7 @@ namespace FormaisECompiladores
                         lp.Add(new prod { nonterminal = NonTerminal.LOC, terminal = Token.Terminals.EMPTY });
                         lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.ASSERT });
                         lp.Add(new prod { nonterminal = NonTerminal.BOOL, terminal = Token.Terminals.EMPTY });
-                        lp.Add(new prod { nonterminal = NonTerminal.DECLS, terminal = Token.Terminals.SEPARATOR });
+                        lp.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.SEPARATOR });
                         llp.Add(lp);
                         lp = new List<prod>();
                         lp.Clear();
@@ -365,7 +365,7 @@ namespace FormaisECompiladores
                         llp.Add(lp);
                         lp = new List<prod>();
                         lp.Clear();
-                        lp.Add(new prod { nonterminal = NonTerminal.LOC, terminal = Token.Terminals.MINUS });                        
+                        lp.Add(new prod { nonterminal = NonTerminal.LOC, terminal = Token.Terminals.EMPTY });                        
                         llp.Add(lp);
                         lp = new List<prod>();
                         lp.Clear();
@@ -394,18 +394,30 @@ namespace FormaisECompiladores
         }
 
         public void calculaFirst() {
+            List<NonTerminal> naoTerminais = new List<NonTerminal>();
             foreach (var t in Producoes) {
                 List<Token.Terminals> terminais = new List<Token.Terminals>();
-                foreach (var b in t.Value) {
-                    int i = 0;
-                    foreach (var h in b) {
-                        if (i == 0) {
+                procuraFirst(t.Key, terminais);
+                first.Add(t.Key, terminais);
+            }
+        }
+
+        public void procuraFirst(NonTerminal naoTerminalAtual, List<Token.Terminals> terminais) {
+            List<List<prod>> p = Producoes[naoTerminalAtual];
+            foreach (var t in p) {
+                int i = 0;
+                foreach (var h in t) {
+                    if (i == 0) {
+                        if (h.nonterminal != NonTerminal.EMPTY) {
+                            if (h.terminal == Token.Terminals.EMPTY) {
+                                procuraFirst(h.nonterminal, terminais);
+                            }
+                        } else {
                             terminais.Add(h.terminal);
                         }
-                        i++;
                     }
+                    i++;
                 }
-                first.Add(t.Key, terminais);
             }
         }
     }
