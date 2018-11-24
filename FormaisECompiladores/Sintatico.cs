@@ -59,6 +59,7 @@ namespace FormaisECompiladores
             Follows = new Dictionary<NonTerminal, HashSet<Token.Terminals>>();
             GenFollows();
             printFirst();
+            printFollow();
 
 
         }
@@ -707,50 +708,75 @@ namespace FormaisECompiladores
                     lt.Add(Token.Terminals.DOLLAR); // $ no primeiro elemento
                 Follows.Add(nt, lt);
             }
-            bool houveMudancas = false, copyToNext = false;
+            bool houveMudancas;
+
             do
             {
                 houveMudancas = false;
-                HashSet<Token.Terminals> temp = new HashSet<Token.Terminals>();
 
                 foreach (NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
                 {
-                    if (copyToNext)
+                    foreach(var lp in Producoes.GetValueOrDefault(nt))
                     {
-                        Follows.GetValueOrDefault(nt).UnionWith(temp);
-                        copyToNext = false;
-                        houveMudancas = true;
-                    }
-
-                    foreach (var lp in Producoes.GetValueOrDefault(nt))
-                    {
-                        if (lp.Count > 1)
+                        if (lp.Count > 2)
                         {
-                            for(int i = 1; i < lp.Count; i++)
+                            for (int i = 0; i < lp.Count -1; i++)
                             {
-                                if (lp[i].terminal != Token.Terminals.EMPTY)
+                                if (lp[i].nonterminal != NonTerminal.EMPTY && lp[i+1].nonterminal != NonTerminal.EMPTY)  // Regra 2
                                 {
-                                    Follows.GetValueOrDefault(nt).Add(lp[i].terminal);
-                                    houveMudancas = true;
-                                }
-                                if (lp[i].nonterminal != NonTerminal.EMPTY)
-                                {
-                                    Follows.Add(nt, First(nt));
-                                    if (Follows.GetValueOrDefault(nt).Contains(Token.Terminals.EMPTY))
-                                        Follows.GetValueOrDefault(nt).Remove(Token.Terminals.EMPTY);
+                                    Follows.GetValueOrDefault(lp[i].nonterminal).Add(Token.Terminals.EMPTY);
+                                    if (!Follows.GetValueOrDefault(lp[i].nonterminal).IsSupersetOf(First(lp[i + 1].nonterminal)))
+                                    {
+                                        Follows.GetValueOrDefault(lp[i].nonterminal).UnionWith(First(lp[i + 1].nonterminal)); // B <- First(c)
+                                        houveMudancas = true;
+                                    }
+                                    Follows.GetValueOrDefault(lp[i].nonterminal).Remove(Token.Terminals.EMPTY);
 
-                                    houveMudancas = true;
+                                    if (First(lp[i+1].nonterminal).Contains(Token.Terminals.EMPTY) && 
+                                        !Follows.GetValueOrDefault(lp[i].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt))) // Regra 3.2
+                                    {
+                                        Follows.GetValueOrDefault(lp[i].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
+                                        houveMudancas = true;
+                                    }
+
+                                    if (i == lp.Count-2) // Regra 3.1
+                                    {
+                                        if (!Follows.GetValueOrDefault(lp[i+1].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
+                                        {
+                                            Follows.GetValueOrDefault(lp[i + 1].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
+                                            houveMudancas = true;
+                                        }
+                                    }
                                 }
-                                break;
+
+                                else if (lp[i].nonterminal != NonTerminal.EMPTY && lp[i+1].terminal != Token.Terminals.EMPTY)
+                                {
+                                    if (Follows.GetValueOrDefault(lp[i].nonterminal).Add(lp[i + 1].terminal))
+                                        houveMudancas = true;
+                                }
                             }
                         }
-                    }
 
-                    if (First(nt).Contains(Token.Terminals.EMPTY))
-                    {
-                        temp = Follows.GetValueOrDefault(nt);
-                        copyToNext = true;
-                        houveMudancas = true;
+                        if (lp.Count == 2) // Regra 3.1
+                        {
+                            if (lp[1].nonterminal != NonTerminal.EMPTY)
+                            {
+                                if (!Follows.GetValueOrDefault(lp[1].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
+                                    houveMudancas = true;
+                                Follows.GetValueOrDefault(lp[1].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
+                            }
+                            if (lp[1].terminal != Token.Terminals.EMPTY && lp[0].nonterminal != NonTerminal.EMPTY)
+                                if (Follows.GetValueOrDefault(lp[0].nonterminal).Add(lp[1].terminal))
+                                    houveMudancas = true;
+                        }
+
+                        if (lp.Count <= 2) // Regra 3.1
+                            if (lp[0].nonterminal != NonTerminal.EMPTY)
+                            {
+                                if (!Follows.GetValueOrDefault(lp[0].nonterminal).IsSupersetOf(Follows.GetValueOrDefault(nt)))
+                                    houveMudancas = true;
+                                Follows.GetValueOrDefault(lp[0].nonterminal).UnionWith(Follows.GetValueOrDefault(nt));
+                            }
                     }
                 }
             } while (houveMudancas);
@@ -767,6 +793,20 @@ namespace FormaisECompiladores
                     term += t.ToString() + ",";
                 }
                 Console.WriteLine("First({0}):{1}", nt.ToString(), term);
+            }
+        }
+
+        public void printFollow()
+        {
+            Console.Write("\n\n\nFollows:\n");
+            foreach (NonTerminal nt in Enum.GetValues(typeof(NonTerminal)))
+            {
+                string term = "";
+                foreach (var follows in Follows.GetValueOrDefault(nt))
+                {
+                    term += follows.ToString() + ",";
+                }
+                Console.WriteLine("Follow({0}): {1}", nt.ToString(), term);
             }
         }
     }
