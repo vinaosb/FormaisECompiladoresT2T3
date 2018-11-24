@@ -23,18 +23,7 @@ namespace FormaisECompiladores
             //}
             Sintatico s = new Sintatico();
             Console.WriteLine("Sintatico");
-            string prod="";
-            foreach(var sy in s.ReferenceTable)
-            {
-                prod = "";
-                foreach (var pr in sy.Value) {
-                    if (pr.nonterminal.Equals(Sintatico.NonTerminal.EMPTY))
-                        prod += pr.terminal.ToString();
-                    else
-                        prod += pr.nonterminal.ToString();
-                }
-                Console.WriteLine("{0},{1}->{2}", sy.Key.nonterminal, sy.Key.terminal, prod);
-            }
+
             Console.Read();
         }
     }
