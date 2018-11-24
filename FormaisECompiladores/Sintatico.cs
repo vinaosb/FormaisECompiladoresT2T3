@@ -704,7 +704,7 @@ namespace FormaisECompiladores
             {
                 HashSet<Token.Terminals> lt = new HashSet<Token.Terminals>();
                 if (nt.Equals(NonTerminal.PROGRAM))
-                    lt.Add(Token.Terminals.EMPTY); // $ no primeiro elemento
+                    lt.Add(Token.Terminals.DOLLAR); // $ no primeiro elemento
                 Follows.Add(nt, lt);
             }
             bool houveMudancas = false, copyToNext = false;

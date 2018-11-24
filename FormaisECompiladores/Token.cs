@@ -23,7 +23,8 @@ namespace FormaisECompiladores
             LOGICAL, // ! || &&
             SEPARATOR, // ;
             ERROR,
-            EMPTY // Auxiliar pro sintatico
+            EMPTY, // Auxiliar pro sintatico
+            DOLLAR
         };
         public enum Terminals
         {
