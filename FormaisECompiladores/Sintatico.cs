@@ -654,5 +654,44 @@ namespace FormaisECompiladores
             }
             return first;
         }
+
+        private List<Token.Terminals> First(NonTerminal nt)
+        {
+            List<Token.Terminals> ret = new List<Token.Terminals>();
+
+            List<List<prod>> llp = Producoes.GetValueOrDefault(nt);
+
+            foreach (var lp in llp)
+            {
+                int i = -1;
+                do
+                {
+                    i++;
+                    if (lp[i].terminal != Token.Terminals.EMPTY)
+                    {
+                        ret.Add(lp[i].terminal);
+                        continue;
+                    }
+                    if (lp[i].terminal == Token.Terminals.EMPTY && lp[0].nonterminal == NonTerminal.EMPTY)
+                        continue;
+
+                    ret.AddRange(First(lp[i].nonterminal));
+
+                } while (NextHasEmpty(lp[i].nonterminal));
+
+            }
+
+            return ret;
+        }
+
+        private bool NextHasEmpty(NonTerminal nt)
+        {
+            List<List<prod>> llp = Producoes.GetValueOrDefault(nt);
+            
+            foreach (var lp in llp)
+                if (lp.Contains(new prod { terminal = Token.Terminals.EMPTY, nonterminal = NonTerminal.EMPTY }))
+                    return true;
+            return false;
+        }
     }
 }
