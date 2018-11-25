@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace FormaisECompiladores
@@ -49,6 +50,7 @@ namespace FormaisECompiladores
         public Dictionary<prod, List<prod>> ReferenceTable { get; set; }
         public Dictionary<NonTerminal, List<Token.Terminals>> first;
         public Dictionary<NonTerminal, HashSet<Token.Terminals>> Follows { get; set; }
+        StreamWriter sr;
 
 
         public Sintatico()
@@ -58,8 +60,8 @@ namespace FormaisECompiladores
             first = new Dictionary<NonTerminal, List<Token.Terminals>>();
             Follows = new Dictionary<NonTerminal, HashSet<Token.Terminals>>();
             GenFollows();
-            printFirst();
-            printFollow();
+            //printFirst();
+            //printFollow();
             ReferenceTable = new Dictionary<prod, List<prod>>();
             initRefTable();
 
@@ -441,6 +443,42 @@ namespace FormaisECompiladores
             }
         }
 
+        public void WriteOutput(List<Token.Tok> lt)
+        {
+            string prod = "";
+            
+            try
+            {   // Open the text file using a stream reader.
+                using (sr = new StreamWriter(@"output.txt"))
+                {
+                    // Read the stream to a string, and write the string to the console.
+                    foreach (var sy in ReferenceTable)
+                    {
+                        prod = "";
+                        foreach (var pr in sy.Value)
+                        {
+                            if (pr.nonterminal.Equals(Sintatico.NonTerminal.EMPTY))
+                                prod += pr.terminal.ToString() + " ";
+                            else
+                                prod += pr.nonterminal.ToString() + " ";
+                        }
+                        prod = prod.Replace("EMPTY", "ɛ");
+                        sr.WriteLine("{0},{1}->{2}", sy.Key.nonterminal, sy.Key.terminal, prod);
+                    }
+
+                    if (predictiveParser(lt, true))
+                        sr.WriteLine("Entrada Aceita");
+                    else
+                        sr.WriteLine("Entrada Nao Aceita");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("The file could not be written:");
+                Console.WriteLine(e.Message);
+            }
+        }
+
         private List<Token.Terminals> getFirstFromProd(List<prod> lp)
         {
             List<Token.Terminals> lt = new List<Token.Terminals>();
@@ -639,17 +677,101 @@ namespace FormaisECompiladores
                 Console.WriteLine("Follow({0}): {1}", nt.ToString(), term);
             }
         }
-        public bool predictiveParser(List<Token.Tok> toks)
+        public bool predictiveParser(List<Token.Tok> toks, bool fileOrConsole)
         {
+            string output = "";
+            bool exit = true;
+            Stack<prod> pilha = new Stack<prod>();
+            List<prod> newItems = new List<prod>();
+
+            if (fileOrConsole)
+            {
+                sr.WriteLine("");
+                sr.WriteLine("Parser: (Pilha)");
+                sr.WriteLine(String.Format("|{0,-70}|{1,-70}|", "Stack", "Matched"));
+                sr.WriteLine(String.Format("|{0,70}|{0,70}|", "PROGRAM $"));
+                toks = checkDollarSign(toks);
+                pilha.Push(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.DOLLAR });
+                pilha.Push(new prod { nonterminal = NonTerminal.PROGRAM, terminal = Token.Terminals.EMPTY });
+                foreach (var token in toks)
+                {
+                    bool searchingTerminal = true;
+                    while (searchingTerminal)
+                    {
+                        newItems = new List<prod>();
+                        newItems.Clear();
+                        if (token.t.Equals(pilha.Peek().terminal))
+                        {
+                            pilha.Pop();
+                            searchingTerminal = false;
+                            output += token.s + " ";
+                            if (token.s == "$")
+                                return true;
+                        }
+                        else if (pilha.Peek().nonterminal.Equals(NonTerminal.EMPTY))
+                        {
+                            //terminal diferente da entrada
+                            pilha.Pop();
+                            output += token.s + " ";
+                            exit = false;
+
+                        }
+                        else //NonTerminal para trocar
+                        {
+                            NonTerminal nt = pilha.Pop().nonterminal;
+                            prod key = new prod { nonterminal = nt, terminal = token.t };
+                            newItems = ReferenceTable[key];
+                            if (newItems[0].terminal.Equals(Token.Terminals.EMPTY)
+                                && newItems[0].nonterminal.Equals(NonTerminal.EMPTY))
+                                newItems.Reverse();
+                            else
+                            {
+                                newItems.Reverse();
+                                foreach (prod p in newItems)
+                                {
+                                    pilha.Push(p);
+                                }
+                                newItems.Reverse();//obrigatorio
+                            }
+                        }
+
+                        string st = "";
+                        foreach (var p in pilha)
+                        {
+                            if (p.nonterminal.Equals(NonTerminal.EMPTY))
+                            {
+                                if (p.terminal.Equals(Token.Terminals.ID))
+                                {
+                                    st += p.terminal + " ";
+                                    continue;
+                                }
+                                foreach (var t in toks)
+                                {
+                                    if (t.t.Equals(p.terminal))
+                                    {
+                                        st += t.s + " ";
+                                        break;
+                                    }
+                                }
+                            }
+                            else
+                                st += p.nonterminal + " ";
+                        }
+                        //Console.WriteLine(st + "  | " + output);
+
+                        sr.WriteLine(String.Format("|{0,70}|{1,70}|", st, output));
+                        if (!exit)
+                            return false;
+                    }
+                }
+
+                return true;
+            }
             Console.WriteLine("");
             Console.WriteLine("Parser: (Pilha)");
             Console.WriteLine(String.Format("|{0,-70}|{1,-70}|", "Stack","Matched"));
             Console.WriteLine(String.Format("|{0,70}|{0,70}|", "PROGRAM $"));
-            string output = "";
-            bool exit=true;
             toks = checkDollarSign(toks);
-            Stack<prod> pilha = new Stack<prod>();
-            List<prod> newItems = new List<prod>();
             pilha.Push(new prod{nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.DOLLAR });
             pilha.Push(new prod { nonterminal = NonTerminal.PROGRAM, terminal = Token.Terminals.EMPTY });
             foreach (var token in toks)

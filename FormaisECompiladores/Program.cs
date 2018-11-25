@@ -38,26 +38,38 @@ namespace FormaisECompiladores
             Console.WriteLine("");
             Console.WriteLine("Parsing Table:");
             Console.WriteLine("...");
-            string prod = "";
-            foreach (var sy in s.ReferenceTable)
-            {
-                prod = "";
-                foreach (var pr in sy.Value)
-                {
-                    if (pr.nonterminal.Equals(Sintatico.NonTerminal.EMPTY))
-                        prod += pr.terminal.ToString()+" ";
-                    else
-                        prod += pr.nonterminal.ToString()+" ";
-                }
-                prod = prod.Replace("EMPTY", "ɛ");
-                Console.WriteLine("{0},{1}->{2}", sy.Key.nonterminal, sy.Key.terminal, prod);
-            }
-            // ##### END PRINT PARSING TABLE ####
+            Console.WriteLine("Output in (f)file or (c)console? Default = file");
 
-            if (s.predictiveParser(lt))
-                Console.WriteLine("Entrada Aceita");
+            char output = Console.ReadLine()[0];
+
+            if (output == 'c')
+            {
+                string prod = "";
+                foreach (var sy in s.ReferenceTable)
+                {
+                    prod = "";
+                    foreach (var pr in sy.Value)
+                    {
+                        if (pr.nonterminal.Equals(Sintatico.NonTerminal.EMPTY))
+                            prod += pr.terminal.ToString()+" ";
+                        else
+                            prod += pr.nonterminal.ToString()+" ";
+                    }
+                    prod = prod.Replace("EMPTY", "ɛ");
+                    Console.WriteLine("{0},{1}->{2}", sy.Key.nonterminal, sy.Key.terminal, prod);
+                }
+                // ##### END PRINT PARSING TABLE ####
+
+                if (s.predictiveParser(lt, false))
+                    Console.WriteLine("Entrada Aceita");
+                else
+                    Console.WriteLine("Entrada Nao Aceita");
+            }
             else
-                Console.WriteLine("Entrada Nao Aceita");
+            {
+                Console.Write("\n\nWriting output.txt");
+                s.WriteOutput(lt);
+            }
          
            // Console.WriteLine('\u025B');
             Console.Read();
