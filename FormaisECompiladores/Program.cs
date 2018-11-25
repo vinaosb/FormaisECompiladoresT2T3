@@ -1,4 +1,13 @@
-﻿using System;
+﻿// ################################################
+// Uiversidade Federal de Santa Catarina
+// INE5421 - Linguagens Formais e Compiladores
+// Trabalho 3 - 2018/2
+// Alunos:
+//      - Marcelo José Dias (15205398)
+//      - Thiago Martendal Salvador (16104594)
+//      - Vinícius Schwinden Berkenbrock (16100751)
+//#################################################
+using System;
 using System.Collections.Generic;
 using System.IO;
 
