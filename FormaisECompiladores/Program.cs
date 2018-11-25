@@ -8,21 +8,25 @@ namespace FormaisECompiladores
     {
         static void Main(string[] args)
         {
-            //string name;
-            //string path = @"";
-            //Console.WriteLine("Escreva o nome do arquivo");
+            Console.WriteLine("===### Analise Sintatica ###===");
+            string name;
+            string path = @"C:\Lex\program.txt";
+            Console.WriteLine("Escreva o nome do arquivo");
             //name = Console.ReadLine();
 
             //path += name;
 
-            //Token t = new Token(path);
-            //List<Token.Tok> lt = t.ReadFile();
-            //foreach(var l in lt)
+            Token t = new Token(path);
+            List<Token.Tok> lt = t.ReadFile();
+            //Console.WriteLine("Analise Lexica");
+            //foreach (var l in lt)
             //{
             //    Console.WriteLine("<{0},{1}>", l.a, l.s);
             //}
             Sintatico s = new Sintatico();
-            Console.WriteLine("Sintatico");
+            // ##### PRINT PARSING TABLE ####
+            Console.WriteLine("Parsing Table:");
+            Console.WriteLine("...");
             string prod = "";
             foreach (var sy in s.ReferenceTable)
             {
@@ -36,6 +40,13 @@ namespace FormaisECompiladores
                 }
                 Console.WriteLine("{0},{1}->{2}", sy.Key.nonterminal, sy.Key.terminal, prod);
             }
+            // ##### END PRINT PARSING TABLE ####
+
+            if (s.predictiveParser(lt))
+                Console.WriteLine("Entrada Aceita");
+            else
+                Console.WriteLine("Entrada Nao Aceita");
+
             Console.Read();
 
         }

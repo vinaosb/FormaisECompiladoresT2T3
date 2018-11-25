@@ -54,12 +54,13 @@ namespace FormaisECompiladores
         {
             Producoes = new Dictionary<NonTerminal, List<List<prod>>>();
             initProd();
-            ReferenceTable = new Dictionary<prod, List<prod>>();
-            initRefTable();
             Follows = new Dictionary<NonTerminal, HashSet<Token.Terminals>>();
             GenFollows();
             printFirst();
             printFollow();
+            ReferenceTable = new Dictionary<prod, List<prod>>();
+            initRefTable();
+
         }
 
         private void initProd()
@@ -426,9 +427,7 @@ namespace FormaisECompiladores
                     }
                     if (hasEpson)
                     {
-                        lt.Clear();
-                        lt = fixedFollow(nt);
-                        foreach (Token.Terminals t in lt) //sao os terminais do Follow
+                        foreach (Token.Terminals t in Follows[nt]) //sao os terminais do Follow
                         {
                             List<prod> lpEpson = new List<prod>();
                             lpEpson.Add(new prod { nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.EMPTY });
@@ -461,9 +460,11 @@ namespace FormaisECompiladores
                     return lt;
                 }
                 //lt = fixedFirst(p.nonterminal);
-                lt.AddRange(fixedFirst(p.nonterminal).FindAll((x) => !lt.Contains(x)));
-                if (!fixedFirst(p.nonterminal).Contains(Token.Terminals.EMPTY))
+                lt.AddRange(new List<Token.Terminals>(First(p.nonterminal)).FindAll((x) => !lt.Contains(x)));
+               // lt.AddRange(fixedFirst(p.nonterminal).FindAll((x) => !lt.Contains(x)));
+                if (!First(p.nonterminal).Contains(Token.Terminals.EMPTY))
                     return lt;
+                
             }
             
             //lt.Add(Token.Terminals.BASIC);//pra testar so.
@@ -1058,6 +1059,77 @@ namespace FormaisECompiladores
                 }
                 Console.WriteLine("Follow({0}): {1}", nt.ToString(), term);
             }
+        }
+        public bool predictiveParser(List<Token.Tok> toks)
+        {
+            toks = checkDollarSign(toks);
+            Stack<prod> pilha = new Stack<prod>();
+            List<prod> newItems = new List<prod>();
+            pilha.Push(new prod{nonterminal = NonTerminal.EMPTY, terminal = Token.Terminals.DOLLAR });
+            pilha.Push(new prod { nonterminal = NonTerminal.PROGRAM, terminal = Token.Terminals.EMPTY });
+            foreach (var token in toks)
+            {
+                bool searchingTerminal = true;
+                while (searchingTerminal)
+                {
+                    newItems = new List<prod>();
+                    newItems.Clear();
+                    if (token.t.Equals(pilha.Peek().terminal))
+                    {
+                        pilha.Pop();
+                        searchingTerminal = false;
+                        if (token.s == "$")
+                            return true;
+                    }
+                    else if (pilha.Peek().nonterminal.Equals(NonTerminal.EMPTY))
+                    {
+                        //terminal diferente da entrada
+                        return false;
+                    }
+                    else //NonTerminal para trocar
+                    {
+                        NonTerminal nt = pilha.Pop().nonterminal;
+                        prod key = new prod{nonterminal=nt,terminal=token.t };
+                        newItems = ReferenceTable[key];
+                        if (newItems[0].terminal.Equals(Token.Terminals.EMPTY)
+                            && newItems[0].nonterminal.Equals(NonTerminal.EMPTY))
+                            newItems.Reverse();
+                        else
+                        {
+                            newItems.Reverse();
+                            foreach (prod p in newItems)
+                            {
+                                pilha.Push(p);
+                            }
+                            newItems.Reverse();//obrigatorio
+                        }
+                    }
+                    Array a = pilha.ToArray();
+                    string st="";
+                    foreach (var p in pilha)
+                    {
+                        if (p.nonterminal.Equals(NonTerminal.EMPTY))
+                            st += p.terminal+" ";
+                        else
+                            st += p.nonterminal+" ";
+                    }
+                    Console.WriteLine(st);
+                }
+            }
+
+            return true;
+        }
+
+        private List<Token.Tok> checkDollarSign(List<Token.Tok> toks)
+        {
+            if (!toks[toks.Count - 1].t.Equals(Token.Terminals.DOLLAR))
+            {
+                Token.Tok token = new Token.Tok();
+                token.s = "$";
+                token.t = Token.Terminals.DOLLAR;
+                toks.Add(token);
+            }
+            return toks;
         }
     }
 }
