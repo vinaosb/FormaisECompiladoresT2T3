@@ -8,13 +8,14 @@ namespace FormaisECompiladores
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = System.Text.Encoding.Unicode;
             Console.WriteLine("===### Analise Sintatica ###===");
             string name;
-            string path = @"C:\Lex\program.txt";
+            string path = @"";
             Console.WriteLine("Escreva o nome do arquivo");
-            //name = Console.ReadLine();
+            name = Console.ReadLine();
 
-            //path += name;
+            path += name;
 
             Token t = new Token(path);
             List<Token.Tok> lt = t.ReadFile();
@@ -25,6 +26,7 @@ namespace FormaisECompiladores
             //}
             Sintatico s = new Sintatico();
             // ##### PRINT PARSING TABLE ####
+            Console.WriteLine("");
             Console.WriteLine("Parsing Table:");
             Console.WriteLine("...");
             string prod = "";
@@ -34,10 +36,11 @@ namespace FormaisECompiladores
                 foreach (var pr in sy.Value)
                 {
                     if (pr.nonterminal.Equals(Sintatico.NonTerminal.EMPTY))
-                        prod += pr.terminal.ToString();
+                        prod += pr.terminal.ToString()+" ";
                     else
-                        prod += pr.nonterminal.ToString();
+                        prod += pr.nonterminal.ToString()+" ";
                 }
+                prod = prod.Replace("EMPTY", "ɛ");
                 Console.WriteLine("{0},{1}->{2}", sy.Key.nonterminal, sy.Key.terminal, prod);
             }
             // ##### END PRINT PARSING TABLE ####
@@ -46,7 +49,8 @@ namespace FormaisECompiladores
                 Console.WriteLine("Entrada Aceita");
             else
                 Console.WriteLine("Entrada Nao Aceita");
-
+         
+           // Console.WriteLine('\u025B');
             Console.Read();
 
         }
